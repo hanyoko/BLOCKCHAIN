@@ -1,0 +1,202 @@
+23/00/00
+
+블록체인 만들기
+
+ "scripts": {
+    "build": "tsc"
+  },
+
+npm run build 를 하면 build 라는 폴더 안에 파일을 생성해준다.
+
+그래서
+
+"scripts": {
+    "build": "tsc",
+    "start": "node build/index.js"
+  },
+
+로 수정해주면 start 를 입력하면 build 폴더 안의 indext.js 파일을 실행하도록 해준다.
+
+=> 작업 효율을 높일 수 있는 방법
+
+
+npm i -D ts-node 설치 
+이게 설치 되어 있으면 빌드 없이 타입스크립트를 실행할 수 있게 된다.
+프로덕션에서 쓰는 패키지는 아니고, 개발환경에서 사용 => 빌드없이 빠르게 새로고침하고 싶을 때 사용
+빌드한 다음에 코드를 실행하지 않아도, ts-code가 컴파일 할 필요없이 타입스크립트를 실행해준다.
+=> 빌드를 계속 수행하면 작업속도가 느려지기에
+
+"scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index",
+    "start": "node build/index.js"
+  },
+
+"dev": "ts-node src/index", 를 추가해준다. (확장자는 생략가능)
+
+
+npm i nodemon 설치
+nodemon 을 설치하면 자동으로 커맨드를 재실행해줘서 일일이 커맨드를 다시 실행할 필요가 없어진다.
+서버를 재시작할 필요없음.
+"scripts": {
+    "build": "tsc",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "start": "node build/index.js"
+  },
+이렇게 수정해주고 npm run dev 입력
+
+console을 수정하면 자동으로 터미널에 bye로 수정한 값이 출력된다.
+
+
+---
+
+블록체인
+
+여러 개의 블록이 사슬처럼 묶인 것
+- 블록 안에는데이터가 들어있고
+-> 블록체인으로 보호하고 싶은 데이터가
+- 그리고 이 블록은 다른 블럭으로 묶여있다/ 사슬처럼 연결되어 있음
+- 그 연결고리는 해쉬값이다.
+
+
+---
+
+{
+    "include": ["src"],
+    "compilerOptions": {
+        "outDir": "build",
+        "target": "ES6",
+        "lib": ["ES6", "DOM"],
+        "strict": true,
+        "allowJs": true,
+        "esModuleInterop": true
+    }
+}
+
+import * as crypto from "crypto"; 할 때, "esModuleInterop": true 를 적어줘야한다.
+"esModuleInterop" 는 우리가 흔히 알고 있는 import export 방식의 모듈이다.
+
+
+"allowJs": true, 는 삭제
+"allowJs" 설정이 있으면 타입스크립트와 자바스크립트를 같이 사용할 수 있다.
+
+
+{
+    "include": ["src"],
+    "compilerOptions": {
+        "outDir": "build",
+        "target": "ES6",
+        "lib": ["ES6"],
+        "strict": true,
+        "esModuleInterop": true,
+        "module": "CommonJS"
+    }
+}
+ "module": "CommonJS" 추가
+만약 브라우저 앱을 만들고 있었다면 umd를 선택
+
+
+import crypto from "crypto"; 수업에서 crypto 에 오류가 발생했는데 내 코드에서는 오류가 없길래 찾아보았다.
+이유는 => 'ts-node' 패키지를 설치할 때, crypto.d.ts가 자동으로 node_modules/@types/node 경로에 생성되기 때문인것 같아요. 따라서 ts-node를 설치하지 않고 import crypto from 'crypto'를 작성하게 되면 이때는 타입정의파일이 없기 때문에 영상에서 니코가 보여준 것과 같은 에러가 발생합니다.
+
+---
+
+#5.6
+
+npm i D @types/node
+패키지를 다운로드 해주면, node의 모듈 패키지를 사용할 수 있다.
+
+---
+
+#5.7
+
+[
+  Block {
+    prevHash: '',
+    height: 1,
+    data: 'First one',
+    hash: 'd90f2cc6ecdb63760af30f041a06e85e9a4d3376cccc09ff807e08c749e81ca9'  },
+  Block {
+    prevHash: 'd90f2cc6ecdb63760af30f041a06e85e9a4d3376cccc09ff807e08c749e81ca9',
+    height: 2,
+    data: 'Second one',
+    hash: '21625d153b9a2ba0996ac8a8ce85b78d5512a4c0bbf647548b0befab3e9b3cfe'  },
+  Block {
+    prevHash: '21625d153b9a2ba0996ac8a8ce85b78d5512a4c0bbf647548b0befab3e9b3cfe',
+    height: 3,
+    data: 'Third one',
+    hash: '33090390c5b209e1796881ef8aa55128e9beab0941cbc6f4989260d6f5bd961b'  },
+  Block {
+    prevHash: 'xxxxxx',
+    height: 111111,
+    data: 'HACKEDDDDD',
+    hash: 'c4a78e320a4b28b653f66fce909a005c3382f9fae42ba5a09c19c9f36a53febd'  }
+]
+
+첫번째 블럭은 이전 해쉬값이 없다.	//prevHash: '',
+하지만 heignt는 1이고, 데이터는 첫번째
+그리고 해쉬값이 있다.	//hash: 'd90f2cc6ecdb63760af30f041a06e85e9a4d3376cccc09ff807e08c749e81ca9'  },
+
+두번째 블럭은 prevHash 값을 통해서 첫번째 블럭과 연결돼 있다. 첫번째 블럭의 hash값과 동일하다.	//prevHash: 'd90f2cc6ecdb63760af30f041a06e85e9a4d3376cccc09ff807e08c749e81ca9',
+두번째 블럭의 해쉬값	//hash: '21625d153b9a2ba0996ac8a8ce85b78d5512a4c0bbf647548b0befab3e9b3cfe'  },
+
+세번째블럭도 prevHash 값을 통해서 두번째 블럭과 연결돼 있다	//prevHash: '21625d153b9a2ba0996ac8a8ce85b78d5512a4c0bbf647548b0befab3e9b3cfe',
+
+why??
+블럭을 리턴할 때, this.blocks을 리턴해주고 있는데 이건 블럭체인 안의 블럭 정보이고 private 값이다.
+하지만 우리가 this.blocks를 리턴하고 있기 때문에 이런 것도 가능하다.
+
+blockchain.getBlocks().push(new Block("xxxxxx", 111111, "HACKEDDDDD"))
+
+새로운 블럭을 배열에 더할 수 있다.
+이전 해쉬값 아무거나 넣고, 높이 아무거나 넣고, 데이터는 HACKEDDDDDD = 너 해킹 당함
+내가 만든 블럭체인이 해킹 당한 것이다.
+
+재실행해서 보면 새로운 블럭이 추가되었는데 가짜 데이터가 들어있다.
+다른 블럭과 연결되어 있지 않다. 정말 안 좋은 일이다.
+
+이것을 리턴해주는 대신에 아예 새로운 배열을 리턴해줄 것이다.
+
+//블럭에 접근할 수 있는 함수
+    public getBlocks() {
+        //return this.blocks;   해킹을 방지하기 위해 수정
+        //배열 안에 있는 데이터를 가진 새로운 배열을 리턴해준다.
+        return [...this.blocks];
+    }
+
+[
+  Block {
+    prevHash: '',
+    height: 1,
+    data: 'First one',
+    hash: 'd90f2cc6ecdb63760af30f041a06e85e9a4d3376cccc09ff807e08c749e81ca9'  },
+  Block {
+    prevHash: 'd90f2cc6ecdb63760af30f041a06e85e9a4d3376cccc09ff807e08c749e81ca9',
+    height: 2,
+    data: 'Second one',
+    hash: '21625d153b9a2ba0996ac8a8ce85b78d5512a4c0bbf647548b0befab3e9b3cfe'  },
+  Block {
+    prevHash: '21625d153b9a2ba0996ac8a8ce85b78d5512a4c0bbf647548b0befab3e9b3cfe',
+    height: 3,
+    data: 'Third one',
+    hash: '33090390c5b209e1796881ef8aa55128e9beab0941cbc6f4989260d6f5bd961b'  }
+]
+
+해킹없이 블럭이 제대로 생성되는 것을 볼 수 있다.
+
+배열 안에 새로운 블럭을 더하고 있지만 블럭체인의 state와는 연결되지않는 것을 확인할 수 있다.
+
+---
+
+#5.8
+
+타입스크립트 핸드북 참고하기
+
+블럭체인에 대해서 배우고 싶다면 노마드 코인 강의 들어보기 
+객체지향 타입스크립트를 이용해서 백엔드를 만드는 걸 배우고 싶다면 NextJS
+
+NextJS, Go 강의 ..
+
+
+
+

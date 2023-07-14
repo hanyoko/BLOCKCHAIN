@@ -67,11 +67,17 @@ class BlockChain {
     }
     //블럭에 접근할 수 있는 함수
     getBlocks() {
-        return this.blocks;
+        //return this.blocks;   해킹을 방지하기 위해 수정
+        //배열 안에 있는 데이터를 가진 새로운 배열을 리턴해준다.
+        return [...this.blocks];
     }
 }
+//새로운 블럭체인 생성
 const blockchain = new BlockChain();
+//새로운 블럭체인 추가
 blockchain.addBlock("First one");
 blockchain.addBlock("Second one");
 blockchain.addBlock("Third one");
+blockchain.addBlock("Fourth one");
+blockchain.getBlocks().push(new Block("xxxxxx", 111111, "HACKEDDDDD"));
 console.log(blockchain.getBlocks());
